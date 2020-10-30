@@ -2,6 +2,7 @@
 
 namespace REDAXO\Simple_SAML\Modules;
 
+use GuzzleHttp\Psr7\ServerRequest;
 use REDAXO\Simple_SAML\Simple_SAML;
 
 abstract class AbstractModule
@@ -20,20 +21,17 @@ abstract class AbstractModule
 
     public function getEntityUrl()
     {
-        $uri = Simple_SAML::$request->getUri();
-        return $uri->getScheme().'://'.$uri->getHost().'/'.Simple_SAML::$basePath.'/'.Simple_SAML::$metadataPath.'/'.$this->getIdentifier();
+        return ServerRequest::fromGlobals()->getUri()->getScheme().'://'.ServerRequest::fromGlobals()->getUri()->getHost().'/'.Simple_SAML::$basePath.'/'.Simple_SAML::$metadataPath.'/'.$this->getIdentifier();
     }
 
     public function getSSOUrl()
     {
-        $uri = Simple_SAML::$request->getUri();
-        return $uri->getScheme().'://'.$uri->getHost().'/'.Simple_SAML::$basePath.'/'.Simple_SAML::$ssoPath.'/'.$this->getIdentifier();
+        return ServerRequest::fromGlobals()->getUri()->getScheme().'://'.ServerRequest::fromGlobals()->getUri()->getHost().'/'.Simple_SAML::$basePath.'/'.Simple_SAML::$ssoPath.'/'.$this->getIdentifier();
     }
 
     public function getSLOUrl()
     {
-        $uri = Simple_SAML::$request->getUri();
-        return $uri->getScheme().'://'.$uri->getHost().'/'.Simple_SAML::$basePath.'/'.Simple_SAML::$sloPath.'/'.$this->getIdentifier();
+        return ServerRequest::fromGlobals()->getUri()->getScheme().'://'.ServerRequest::fromGlobals()->getUri()->getHost().'/'.Simple_SAML::$basePath.'/'.Simple_SAML::$sloPath.'/'.$this->getIdentifier();
     }
 
     public function getsingleSignOnServiceBinding()
@@ -63,7 +61,7 @@ abstract class AbstractModule
 
     public function getKey()
     {
-        return self::$key;
+        return static::$key;
     }
 
     abstract public function authenticate(string $SAMLRequest, string $RelayState);

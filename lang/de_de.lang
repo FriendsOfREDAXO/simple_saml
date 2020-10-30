@@ -1,0 +1,15 @@
+simple_saml = Simple SAML
+simple_saml_readme = Readme
+simple_saml_profiles = Profile
+
+simple_saml_metadata_list = Metadata Liste
+simple_saml_sp_entity_id = Service Provider entityId
+simple_saml_idp_entity_id = Identity Provider entityId
+simple_saml_func = Funktionen
+simple_saml_show_item = Details anzeigen
+simple_saml_metadata_defail = Metadata Details `{0}`
+simple_saml_no_metadatas_found = Bisher wurden keine Eintragungen gefunden
+simple_saml_info_type = Bezeichnung
+simple_saml_info_value = Wert
+simple_saml_metadata_not_found = Metadaten können nicht angezeigt werden: {0}
+

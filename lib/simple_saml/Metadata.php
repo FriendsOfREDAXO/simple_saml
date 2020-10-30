@@ -3,7 +3,10 @@
 namespace REDAXO\Simple_SAML;
 
 use LightSaml\ClaimTypes;
+use LightSaml\Credential\X509Certificate;
 use LightSaml\SamlConstants;
+use REDAXO\Simple_SAML\Modules\AbstractModule;
+use RobRichards\XMLSecLibs\XMLSecurityKey;
 
 class Metadata
 {
@@ -52,6 +55,43 @@ class Metadata
         return $this->data['NameIDFormat'];
     }
 
+    public function getInfoArray()
+    {
+        /** @var AbstractModule $Idp */
+        $Idp = $this->getIdp();
+
+        /** @var X509Certificate $cert */
+        $cert = $Idp->getCertificate();
+        $x509cert = '';
+        if ($cert) {
+            $x509cert = $this->data['idp']['x509cert'];
+        }
+        /** @var XMLSecurityKey $privateKey */
+        $private = ($Idp->getPrivateKey()) ? 'exists' : 'missing';
+
+        return [
+            'Service Provider' => [
+                'entityId' => $this->getIdentifier(),
+                'AssertionConsumerServiceURL' => $this->getAssertionConsumerServiceURL(),
+                'AssertionConsumerServiceBinding' => $this->getAssertionConsumerServiceBinding(),
+                'NameIdFormat' => $this->getNameIDFormat(),
+            ],
+            'Identity Provider' => [
+                'entityId' => $Idp->getEntityUrl(),
+                'singleSignOnServiceURL' => $Idp->getSSOUrl(),
+                'singleSignOnServiceBinding' => $Idp->getsingleSignOnServiceBinding(),
+                'singleLogoutServiceURL' => $Idp->getSLOUrl(),
+                'singleLogoutServiceBinding' => $Idp->getsingleSignOutServiceBinding(),
+                'x509cert' => $x509cert,
+                'privateKey' => $private,
+            ],
+            'Modul Informationen' => [
+                'Modultyp' => $Idp->getKey(),
+                'Claims' => implode("\n", $this->getClaims()),
+            ],
+        ];
+    }
+
     // TODO:
     public function getSingleLogoutServiceURL()
     {
@@ -60,7 +100,7 @@ class Metadata
 
     public function getClaims()
     {
-        return $this->data['Claims'] ?? [ClaimTypes::EMAIL_ADDRESS, ClaimTypes::COMMON_NAME];
+        return $this->data['idp']['Claims'] ?? [ClaimTypes::EMAIL_ADDRESS, ClaimTypes::COMMON_NAME];
     }
 
     public function getIssuer()
@@ -71,6 +111,11 @@ class Metadata
     public static function addMetadata($metadata)
     {
         self::$metadata[] = $metadata;
+    }
+
+    public static function getAll()
+    {
+        return self::$metadata;
     }
 
     public static function get(string $identifier)
@@ -94,5 +139,4 @@ class Metadata
         }
         throw new \Exception('Identity Provider not found with this identifier '. $identifier);
     }
-
 }

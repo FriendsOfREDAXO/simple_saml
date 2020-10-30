@@ -84,11 +84,6 @@ Und hierrüber werden diese Metadaten angemeldet
 \REDAXO\Simple_Saml\Metadata::addMetadata(new \REDAXO\Simple_SAML\Metadata($metadata));
 ```
 
-Der Identity Provider funktioniert über folgende Domains
-
-https://die_webseite_die_saml_anbietet.de/saml/sso/[IdpEntityId]
-https://die_webseite_die_saml_anbietet.de/saml/metadata/[IdpEntityId]
-
 ### Service Provider
 
 Die Informationen des SP müssen hier eingetragen werden.
@@ -147,6 +142,10 @@ Die Claims definieren, welche Informationen der Serviceprovider zurückgeben sol
         ]
 ```
 
+Der Identity Provider funktioniert über folgende Domains
+
+https://die_webseite_die_saml_anbietet.de/saml/sso/[IdpEntityId]
+https://die_webseite_die_saml_anbietet.de/saml/metadata/[IdpEntityId]
 
 
 

@@ -1,11 +1,18 @@
 package: simple_saml
-version: '0.9.2'
+version: '1.0.0-dev'
 
 page:
     title: 'translate:simple_saml'
-    perm: simple_saml[]
+    perm: admin[]
+    pjax: true
     subpages:
-        settings: { title: 'translate:settings' }
+        profiles:
+            title: 'translate:profiles'
+        readme:
+            title: 'translate:readme'
+            icon: rex-icon fa-info-circle
+            itemclass: pull-right
+
 requires:
     packages:
         yform: '^3'

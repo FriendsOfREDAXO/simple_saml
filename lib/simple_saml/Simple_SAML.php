@@ -6,7 +6,6 @@ use DateTime;
 use Exception;
 use GuzzleHttp\Psr7\ServerRequest;
 use LightSaml\Binding\BindingFactory;
-use LightSaml\Builder\EntityDescriptor\SimpleEntityDescriptorBuilder;
 use LightSaml\Context\Profile\MessageContext;
 use LightSaml\Helper;
 use LightSaml\Model\Assertion\Assertion;
@@ -143,7 +142,6 @@ class Simple_SAML
 
         header('Content-Type: text/xml');
         return $document->saveXML();
-
     }
 
     protected function handleSAMLRequest()
