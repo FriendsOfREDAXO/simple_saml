@@ -131,7 +131,7 @@ Wie man so ein key pair erstellt wird hier genauer beschrieben: https://www.ligh
 'privateKey' => '-----BEGIN PRIVATE KEY----- ... -----END PRIVATE KEY-----',
 ```
 
-Die Claims definieren, welche Informationen der Serviceprovider zurückgeben soll. Welche möglich sind, kann man im Modul YCom nachsehen. (in addons/simple_saml/lib/)
+Die Claims definieren, welche Informationen der Identity Provider zurückgeben soll. Welche möglich sind, kann man im Modul YCom nachsehen. (in addons/simple_saml/lib/)
 
 ```
 'Claims' => [
