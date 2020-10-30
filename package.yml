@@ -1,0 +1,12 @@
+package: simple_saml
+version: '0.9.2'
+
+page:
+    title: 'translate:simple_saml'
+    perm: simple_saml[]
+    subpages:
+        settings: { title: 'translate:settings' }
+requires:
+    packages:
+        yform: '^3'
+        ycom: '^4'
