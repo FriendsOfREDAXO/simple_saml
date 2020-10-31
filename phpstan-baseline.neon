@@ -61,11 +61,6 @@ parameters:
 			path: lib/simple_saml/Simple_SAML.php
 
 		-
-			message: "#^Call to static method logException\\(\\) on an unknown class REDAXO\\\\Simple_SAML\\\\rex_logger\\.$#"
-			count: 1
-			path: lib/simple_saml/Simple_SAML.php
-
-		-
 			message: "#^Parameter \\#1 \\$singleLogoutService of method LightSaml\\\\Model\\\\Metadata\\\\SSODescriptor\\:\\:addSingleLogoutService\\(\\) expects LightSaml\\\\Model\\\\Metadata\\\\SingleLogoutService, LightSaml\\\\Model\\\\Metadata\\\\Endpoint given\\.$#"
 			count: 1
 			path: lib/simple_saml/Simple_SAML.php
