@@ -46,11 +46,6 @@ parameters:
 			path: lib/simple_saml/Modules/YCom.php
 
 		-
-			message: "#^Parameter \\#2 \\$prefix of function http_build_query expects string, null given\\.$#"
-			count: 1
-			path: lib/simple_saml/Modules/YCom.php
-
-		-
 			message: "#^Call to static method getFullUrlByArticleId\\(\\) on an unknown class rex_yrewrite\\.$#"
 			count: 1
 			path: lib/simple_saml/Modules/YCom.php
