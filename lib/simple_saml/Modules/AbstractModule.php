@@ -9,6 +9,11 @@ abstract class AbstractModule
 {
     public static $key = 'default';
 
+    /**
+     * @var array
+     */
+    protected $data;
+
     public function __construct(array $data = [])
     {
         $this->data = $data;

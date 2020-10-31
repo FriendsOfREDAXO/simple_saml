@@ -6,16 +6,6 @@ parameters:
 			path: lib/simple_saml/Metadata.php
 
 		-
-			message: "#^Access to an undefined property REDAXO\\\\Simple_SAML\\\\Modules\\\\AbstractModule\\:\\:\\$data\\.$#"
-			count: 3
-			path: lib/simple_saml/Modules/AbstractModule.php
-
-		-
-			message: "#^Access to an undefined property REDAXO\\\\Simple_SAML\\\\Modules\\\\YCom\\:\\:\\$data\\.$#"
-			count: 3
-			path: lib/simple_saml/Modules/YCom.php
-
-		-
 			message: "#^Call to static method getMe\\(\\) on an unknown class rex_ycom_user\\.$#"
 			count: 5
 			path: lib/simple_saml/Modules/YCom.php
