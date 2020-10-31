@@ -96,7 +96,8 @@ class Simple_SAML
             }
             exit;
         } catch (\Exception $e) {
-            dump($e->getMessage());
+            rex_logger::logException($e);
+            
             echo 'Joa - da ist ein Fehler';
             exit;
         }
