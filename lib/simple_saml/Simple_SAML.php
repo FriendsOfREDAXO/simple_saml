@@ -4,6 +4,7 @@ namespace REDAXO\Simple_SAML;
 
 use DateTime;
 use Exception;
+use rex_logger;
 use GuzzleHttp\Psr7\ServerRequest;
 use LightSaml\Binding\BindingFactory;
 use LightSaml\Context\Profile\MessageContext;
