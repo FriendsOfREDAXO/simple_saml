@@ -2,5 +2,13 @@
     "require": {
         "guzzlehttp/psr7": "^1.7",
         "lightsaml/lightsaml": "^1.4"
+    },
+    "require-dev": {
+        "redaxo/source": "^5.11",
+        "phpstan/phpstan": "0.12.52"
+    },
+    "scripts": {
+        "phpstan": "phpstan analyse",
+        "phpstan-baseline": "phpstan analyse --generate-baseline"
     }
 }
