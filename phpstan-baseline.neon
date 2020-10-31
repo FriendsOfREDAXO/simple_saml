@@ -6,11 +6,6 @@ parameters:
 			path: lib/simple_saml/Metadata.php
 
 		-
-			message: "#^Variable \\$privateKey in PHPDoc tag @var does not match assigned variable \\$private\\.$#"
-			count: 1
-			path: lib/simple_saml/Metadata.php
-
-		-
 			message: "#^Access to an undefined property REDAXO\\\\Simple_SAML\\\\Modules\\\\AbstractModule\\:\\:\\$data\\.$#"
 			count: 3
 			path: lib/simple_saml/Modules/AbstractModule.php
