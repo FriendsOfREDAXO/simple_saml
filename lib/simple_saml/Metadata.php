@@ -66,7 +66,6 @@ class Metadata
         if ($cert) {
             $x509cert = $this->data['idp']['x509cert'];
         }
-        /** @var XMLSecurityKey $privateKey */
         $private = ($Idp->getPrivateKey()) ? 'exists' : 'missing';
 
         return [

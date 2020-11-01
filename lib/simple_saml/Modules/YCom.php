@@ -112,7 +112,7 @@ class YCom extends AbstractModule
             $urlParams['RelayState'] = $RelayState;
         }
 
-        $returnToUrl = $url.'?'.http_build_query($urlParams, null, '&');
+        $returnToUrl = $url.'?'.http_build_query($urlParams, '', '&');
 
         $login_id = \rex_config::get('ycom/auth', 'article_id_login');
         if (!$login_id) {
