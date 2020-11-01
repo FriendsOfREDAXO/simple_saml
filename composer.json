@@ -5,7 +5,10 @@
     },
     "require-dev": {
         "redaxo/source": "^5.11",
-        "phpstan/phpstan": "0.12.52"
+        "phpstan/phpstan": "0.12.52",
+        "yakamara/redaxo_yform": "dev-master",
+        "yakamara/redaxo_ycom": "dev-master",
+        "yakamara/redaxo_yrewrite": "dev-master"
     },
     "scripts": {
         "phpstan": "phpstan analyse",
