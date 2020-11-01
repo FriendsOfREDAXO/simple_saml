@@ -36,11 +36,6 @@ parameters:
 			path: lib/simple_saml/Modules/YCom.php
 
 		-
-			message: "#^Call to static method getFullUrlByArticleId\\(\\) on an unknown class rex_yrewrite\\.$#"
-			count: 1
-			path: lib/simple_saml/Modules/YCom.php
-
-		-
 			message: "#^Static property REDAXO\\\\Simple_SAML\\\\Simple_SAML\\:\\:\\$request \\(GuzzleHttp\\\\Psr7\\\\ServerRequest\\) does not accept Psr\\\\Http\\\\Message\\\\ServerRequestInterface\\.$#"
 			count: 1
 			path: lib/simple_saml/Simple_SAML.php

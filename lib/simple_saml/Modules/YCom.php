@@ -2,6 +2,7 @@
 
 namespace REDAXO\Simple_SAML\Modules;
 
+use GuzzleHttp\Psr7\ServerRequest;
 use LightSaml\ClaimTypes;
 use LightSaml\Credential\KeyHelper;
 use LightSaml\Credential\X509Certificate;
@@ -119,9 +120,11 @@ class YCom extends AbstractModule
             throw new \Exception('YCom - LoginId is not defined');
         }
 
-        $loginUrl = \rex_yrewrite::getFullUrlByArticleId($login_id, '', [
+        $loginUrl = rex_getUrl($login_id, '', [
             'returnTo' => $returnToUrl,
         ], '&');
+
+        $loginUrl = ServerRequest::fromGlobals()->getUri()->getScheme().'://'.ServerRequest::fromGlobals()->getUri()->getHost().$loginUrl;
 
         \rex_response::sendRedirect($loginUrl);
     }
