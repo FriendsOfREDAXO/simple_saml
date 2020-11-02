@@ -1,5 +1,5 @@
 package: simple_saml
-version: '1.0.0-dev'
+version: '1.0'
 
 page:
     title: 'translate:simple_saml'
@@ -17,3 +17,4 @@ requires:
     packages:
         yform: '^3'
         ycom: '^4'
+    redaxo: '^5.11'
