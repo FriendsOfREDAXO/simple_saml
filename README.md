@@ -1,4 +1,4 @@
-# REDAXO - SAML Identity Provider via YCom-AddOn
+# REDAXO 5 - SAML Identity Provider via YCom-AddOn
 
 Über dieses AddOn können 3rd Party Applikationen die YCom als Identity Provider nutzen, so dass man keine weiteren Logins anlegen muss und die YCom als SingleSignOn Server verwendet werden kann.
 
