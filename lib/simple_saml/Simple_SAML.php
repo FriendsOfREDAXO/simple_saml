@@ -4,10 +4,10 @@ namespace REDAXO\Simple_SAML;
 
 use DateTime;
 use Exception;
-use rex_logger;
 use GuzzleHttp\Psr7\ServerRequest;
 use LightSaml\Binding\BindingFactory;
 use LightSaml\Context\Profile\MessageContext;
+use LightSaml\Credential\KeyHelper;
 use LightSaml\Helper;
 use LightSaml\Model\Assertion\Assertion;
 use LightSaml\Model\Assertion\Attribute;
@@ -28,9 +28,12 @@ use LightSaml\Model\Protocol\AuthnRequest;
 use LightSaml\Model\Protocol\Response;
 use LightSaml\Model\Protocol\Status;
 use LightSaml\Model\Protocol\StatusCode;
+use LightSaml\Model\XmlDSig\SignatureStringReader;
 use LightSaml\Model\XmlDSig\SignatureWriter;
 use LightSaml\SamlConstants;
 use REDAXO\Simple_SAML\Modules\AbstractModule;
+use rex_logger;
+use RobRichards\XMLSecLibs\XMLSecurityKey;
 
 class Simple_SAML
 {
@@ -98,8 +101,7 @@ class Simple_SAML
             exit;
         } catch (\Exception $e) {
             rex_logger::logException($e);
-            
-            echo 'Joa - da ist ein Fehler';
+
             exit;
         }
     }
@@ -161,6 +163,28 @@ class Simple_SAML
             throw new Exception('Identify Provider Module not found');
         }
 
+        // Check Request Signature
+        if ($this->Metadata->getSignMetadata()) {
+            $SpCert = $this->Metadata->getCertificate();
+
+            /** @var XMLSecurityKey $SPXmlSecurityKey */
+            $SPXmlSecurityKey = KeyHelper::createPublicKey($SpCert);
+
+            $SigAlgString = \rex_request::get('SigAlg', 'string', null);
+            $SignatureString = \rex_request::get('Signature', 'string', null);
+
+            $msg = [];
+            foreach ($_REQUEST as $k => $r) {
+                if ('Signature' != $k) {
+                    $msg[] = $k.'='.urlencode($r);
+                }
+            }
+            $msg = implode('&', $msg);
+
+            $b = new SignatureStringReader($SignatureString, $SigAlgString, $msg);
+            $b->validate($SPXmlSecurityKey);
+        }
+
         if (!$this->Idp->isAuthenticated()) {
             $this->Idp->authenticate($this->SAMLRequest, $this->RelayState);
         }
@@ -188,8 +212,6 @@ class Simple_SAML
         /** @var Subject $subject */
         $subject = $this->Idp->getSubject($this->Metadata->getNameIDFormat(), $authnRequest->getNameIDPolicy());
 
-        $AssertionConsumerServiceURL = htmlspecialchars((string) $authnRequest->getAssertionConsumerServiceURL(), ENT_XML1, 'UTF-8');
-
         $AttributeStatement = new AttributeStatement();
 
         foreach ($this->Metadata->getClaims() as $ClaimType) {
@@ -214,7 +236,7 @@ class Simple_SAML
                                 (new SubjectConfirmationData())
                                     ->setInResponseTo($authnRequest->getId())
                                     ->setNotOnOrAfter(new DateTime('+1 MINUTE'))
-                                    ->setRecipient($AssertionConsumerServiceURL)
+                                    ->setRecipient($this->Metadata->getIdentifier())
                             )
                     )
             )
@@ -223,25 +245,22 @@ class Simple_SAML
                     ->setNotBefore(new DateTime())
                     ->setNotOnOrAfter(new DateTime('+1 MINUTE'))
                     ->addItem(
-                        new AudienceRestriction([$AssertionConsumerServiceURL])
+                        new AudienceRestriction([$this->Metadata->getIdentifier()]) // getAssertionConsumerServiceURL()])
                     )
             )
             ->addItem(
                 $AttributeStatement
             )
-            /*
             ->addItem(
                 (new AuthnStatement())
                     ->setAuthnInstant(new \DateTime('-10 MINUTE'))
-                    ->setSessionIndex('_some_session_index')
+//                     ->setSessionIndex('_some_session_index')
                     ->setAuthnContext(
                         (new AuthnContext())
                             ->setAuthnContextClassRef(SamlConstants::AUTHN_CONTEXT_PASSWORD_PROTECTED_TRANSPORT)
                     )
-            )*/
+            )
         ;
-
-        // dump($assertion); exit;
 
         return $this->sendSAMLResponse($response);
     }
