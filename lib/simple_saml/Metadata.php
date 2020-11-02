@@ -6,7 +6,6 @@ use LightSaml\ClaimTypes;
 use LightSaml\Credential\X509Certificate;
 use LightSaml\SamlConstants;
 use REDAXO\Simple_SAML\Modules\AbstractModule;
-use RobRichards\XMLSecLibs\XMLSecurityKey;
 
 class Metadata
 {
@@ -21,6 +20,28 @@ class Metadata
     public function getIdentifier()
     {
         return $this->data['entityId'] ?? null;
+    }
+
+    public function getCertificate()
+    {
+        if (!isset($this->data['x509cert'])) {
+            return null;
+        }
+        try {
+            $cert = new X509Certificate();
+            $cert->loadPem($this->data['x509cert']);
+            return $cert;
+        } catch (\Exception $e) {
+            throw new \Exception('SAML SP Certificate Error '. $e->getMessage());
+        }
+    }
+
+    public function getSignMetadata()
+    {
+        if (!isset($this->data['signMetadata'])) {
+            return false;
+        }
+        return $this->data['signMetadata'] ? true : false;
     }
 
     public function getIdp()
@@ -104,7 +125,7 @@ class Metadata
 
     public function getIssuer()
     {
-        return $this->getIdp()->getIdentifier();
+        return $this->getIdp()->getEntityUrl();
     }
 
     public static function addMetadata($metadata)

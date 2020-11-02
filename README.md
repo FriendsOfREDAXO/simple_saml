@@ -31,8 +31,9 @@ $metadata = [
         'url' => 'http://webseite_die_saml_nutzen_will.de/slo/',
         'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
     ],
+    'signMetadata' => false, // default is false
     'NameIDFormat' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified',
-
+//    'x509cert' => '',
     'idp' => [
         'AuthModule' => 'YCom', // Im Moment nur YCom möglich
         'entityId' => 'irgendeinekennungohneleerzeichen',
