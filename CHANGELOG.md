@@ -1,6 +1,13 @@
 Changelog
 =========
 
+Version 1.0 – 02.11.2020
+--------------------------
+
+- GithubAction with phpstan eingebunden
+- YRewrite Abhängigkeit entfernt
+- rex_logger ergänzt sobald Exception auftritt
+
 
 Version 1.0.0-dev – 31.10.2020
 --------------------------
