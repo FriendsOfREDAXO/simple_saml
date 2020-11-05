@@ -14,5 +14,5 @@ jobs:
           token: ${{ secrets.STAABM_TOKEN }}
           # reactions should be reported from github itself
           reaction-token: ${{ secrets.GITHUB_TOKEN }}
-          commands: csfix, phpstan-baseline
+          commands: phpstan-baseline
           issue-type: pull-request
