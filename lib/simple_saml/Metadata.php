@@ -9,6 +9,9 @@ use REDAXO\Simple_SAML\Modules\AbstractModule;
 
 class Metadata
 {
+    /**
+     * @var int
+     */
     private static $metadata = [];
     private $data = [];
 
