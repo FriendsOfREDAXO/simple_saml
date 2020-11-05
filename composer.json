@@ -11,6 +11,7 @@
         "yakamara/redaxo_yrewrite": "dev-master"
     },
     "scripts": {
+        "update-deps": "@composer update --no-dev",
         "phpstan": "phpstan analyse",
         "phpstan-baseline": "phpstan analyse --generate-baseline"
     }
