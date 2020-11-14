@@ -6,33 +6,13 @@ parameters:
 			path: lib/simple_saml/Metadata.php
 
 		-
-			message: "#^Call to static method getMe\\(\\) on an unknown class rex_ycom_user\\.$#"
-			count: 5
-			path: lib/simple_saml/Modules/YCom.php
-
-		-
-			message: "#^PHPDoc tag @var for variable \\$user contains unknown class rex_yform_manager_dataset\\.$#"
-			count: 1
-			path: lib/simple_saml/Modules/YCom.php
-
-		-
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
 			path: lib/simple_saml/Modules/YCom.php
 
 		-
-			message: "#^Call to method getValue\\(\\) on an unknown class rex_yform_manager_dataset\\.$#"
-			count: 7
-			path: lib/simple_saml/Modules/YCom.php
-
-		-
 			message: "#^Unreachable statement \\- code above always terminates\\.$#"
 			count: 7
-			path: lib/simple_saml/Modules/YCom.php
-
-		-
-			message: "#^Call to method getRelatedCollection\\(\\) on an unknown class rex_yform_manager_dataset\\.$#"
-			count: 1
 			path: lib/simple_saml/Modules/YCom.php
 
 		-
