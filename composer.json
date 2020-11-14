@@ -13,5 +13,10 @@
         "update-deps": "@composer update --no-dev",
         "phpstan": "phpstan analyse",
         "phpstan-baseline": "phpstan analyse --generate-baseline"
+    },
+    "autoload-dev": {
+        "classmap": [
+            "vendor/yakamara/"
+        ]
     }
 }
