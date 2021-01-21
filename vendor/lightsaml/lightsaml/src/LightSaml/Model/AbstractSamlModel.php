@@ -105,8 +105,6 @@ abstract class AbstractSamlModel implements SamlElementInterface
                 $object->serialize($node, $context);
             } elseif ($nodeName) {
 
-                $object = htmlentities($object);
-
                 if ($namespaceUri) {
                     $child = $context->getDocument()->createElementNS($namespaceUri, $nodeName, (string) $object);
                 } else {
