@@ -51,6 +51,11 @@ abstract class AbstractModule
         return 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect';
     }
 
+    public function logoutUser(\REDAXO\Simple_SAML\Simple_SAML $simple_SAML)
+    {
+        return true;
+    }
+
     abstract public function getCertificate();
 
     abstract public function getPrivateKey();

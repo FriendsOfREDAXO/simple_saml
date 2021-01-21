@@ -9,6 +9,7 @@ use LightSaml\Credential\X509Certificate;
 use LightSaml\Model\Assertion\NameID;
 use LightSaml\Model\Assertion\Subject;
 use LightSaml\SamlConstants;
+use REDAXO\Simple_SAML\Simple_SAML;
 
 class YCom extends AbstractModule
 {
@@ -44,7 +45,7 @@ class YCom extends AbstractModule
                 $value = \rex_ycom_user::getMe()->getValue('email');
                 break;
             case SamlConstants::NAME_ID_FORMAT_TRANSIENT: // no info about identity
-                $value = 'anonymous';
+                $value = \rex_ycom_user::getMe()->getValue('email');
                 break;
             default:
                 $format = SamlConstants::NAME_ID_FORMAT_UNSPECIFIED;
@@ -56,6 +57,11 @@ class YCom extends AbstractModule
                 $value,
                 $format
             ));
+    }
+
+    public function logoutUser(Simple_SAML $simple_SAML)
+    {
+        return true;
     }
 
     public function getClaimValue($claim)

@@ -112,10 +112,17 @@ class Metadata
         ];
     }
 
-    // TODO:
     public function getSingleLogoutServiceURL()
     {
         return $this->data['singleLogoutService']['url'];
+    }
+
+    public function getSingleLogoutServiceBinding()
+    {
+        if (SamlConstants::BINDING_SAML2_HTTP_REDIRECT != $this->data['singleLogoutService']['binding']) {
+            throw new \Exception('Only '.SamlConstants::BINDING_SAML2_HTTP_REDIRECT.' is supported');
+        }
+        return SamlConstants::BINDING_SAML2_HTTP_REDIRECT;
     }
 
     public function getClaims()
