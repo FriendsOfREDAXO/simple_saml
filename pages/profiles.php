@@ -8,15 +8,13 @@ $Metadatas = \REDAXO\Simple_SAML\Metadata::getAll();
 $content = '';
 $content = '<table class="table table-hover">';
 $content .= '<thead>
-            <th>'.rex_i18n::msg('simple_saml_sp_entity_id').'</th>
-            <th>'.rex_i18n::msg('simple_saml_idp_entity_id').'</th>
+            <th>'.rex_i18n::msg('simple_saml_sp_entity_id').' / <br />'.rex_i18n::msg('simple_saml_idp_entity_id').'</th>
             <th>'.rex_i18n::msg('simple_saml_func').'</th>
             </thead>';
 $content .= '<tbody>';
 foreach ($Metadatas as $Metadata) {
     $content .= '<tr class="rex">';
-    $content .= '<td>'.$Metadata->getIdentifier().'</td>';
-    $content .= '<td>'.$Metadata->getIdp()->getIdentifier().'</td>';
+    $content .= '<td>'.rex_formatter::truncate($Metadata->getIdentifier(), ['length' => 30]).'<br />'.rex_formatter::truncate($Metadata->getIdp()->getEntityUrl(), ['length' => 30]).'</td>';
     $content .= '<td><a href="'.rex_url::currentBackendPage(['func' => 'open', 'idp_id' => $Metadata->getIdp()->getIdentifier()]).'">'.rex_i18n::msg('simple_saml_show_item').'</a></td>';
     $content .= '</tr>';
 }
