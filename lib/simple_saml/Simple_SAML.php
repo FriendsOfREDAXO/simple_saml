@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace REDAXO\Simple_SAML;
 
 use DateTime;
@@ -25,6 +27,8 @@ use LightSaml\Model\Context\SerializationContext;
 use LightSaml\Model\Metadata\SingleLogoutService;
 use LightSaml\Model\Metadata\SingleSignOnService;
 use LightSaml\Model\Protocol\AuthnRequest;
+use LightSaml\Model\Protocol\LogoutRequest;
+use LightSaml\Model\Protocol\LogoutResponse;
 use LightSaml\Model\Protocol\Response;
 use LightSaml\Model\Protocol\Status;
 use LightSaml\Model\Protocol\StatusCode;
@@ -62,7 +66,7 @@ class Simple_SAML
         self::$request = ServerRequest::fromGlobals();
         $currentPathAsArray = explode('/', self::$request->getUri()->getPath());
         if (!isset($currentPathAsArray[1]) || $currentPathAsArray[1] != self::$basePath ||
-            !\in_array($currentPathAsArray[2], self::$funcPaths) || !isset($currentPathAsArray[2]) ||
+            !\in_array($currentPathAsArray[2], self::$funcPaths, true) || !isset($currentPathAsArray[2]) ||
             !isset($currentPathAsArray[3]) || '' == $currentPathAsArray[3]
         ) {
             return false;
@@ -71,10 +75,10 @@ class Simple_SAML
         $this->SAMLRequest = rex_request('SAMLRequest', 'string', null);
         $this->RelayState = rex_request('RelayState', 'string', null);
 
-        /** @var Metadata $Metadata */
-        $this->Metadata = Metadata::getByIdp($currentPathAsArray[3]);
-
         try {
+            /* @var Metadata $Metadata */
+            $this->Metadata = Metadata::getByIdp($currentPathAsArray[3]);
+
             if (!$this->Metadata) {
                 throw new \Exception('Metadata not found');
             }
@@ -87,15 +91,20 @@ class Simple_SAML
             switch ($currentPathAsArray[2]) {
                 case self::$sloPath: // TODO: init Logout processs with returnTo or redirect from idp
                 case self::$slsPath: // TODO: process Logout without returnTo
-                    echo 'not yet implemented';
+                    if ($this->SAMLRequest) {
+                        echo $this->handleSAMLLogoutRequest();
+                    }
+
                     break;
                 case self::$metadataPath:
                     echo $this->getEntityDescriptor();
+
                     break;
                 case self::$ssoPath:
                     if ($this->SAMLRequest) {
-                        echo $this->handleSAMLRequest();
+                        echo $this->handleSAMLLoginRequest();
                     }
+
                     break;
             }
             exit;
@@ -145,12 +154,63 @@ class Simple_SAML
         $entityDescriptor->serialize($document, $serializationContext);
 
         header('Content-Type: text/xml');
+
         return $document->saveXML();
     }
 
-    protected function handleSAMLRequest()
+    protected function handleSAMLLogoutRequest()
     {
-        $decoded = base64_decode($this->SAMLRequest);
+        $decoded = base64_decode($this->SAMLRequest, true);
+        $xml = gzinflate($decoded);
+
+        $deserializationContext = new DeserializationContext();
+        $deserializationContext->getDocument()->loadXML($xml);
+
+        // $xml = str_replace(">", ">\n", ($xml)); echo "<br /><br />".nl2br(htmlspecialchars($xml));
+
+        // TODO:
+        // Logout User .. assertion auslesen udn ausloggen
+        // slo, sls / mit returnTo und Ohne beachten.
+
+        $logoutStatus = $this->Idp->logoutUser($this);
+
+        $LogoutRequest = new LogoutRequest();
+        $LogoutRequest->deserialize($deserializationContext->getDocument()->firstChild, $deserializationContext);
+
+        // dump($this->SAMLRequest); dump($LogoutRequest);
+
+        $response = new LogoutResponse();
+        $response
+            ->setRelayState($LogoutRequest->getRelayState())
+            ->setStatus(new Status(new StatusCode(SamlConstants::STATUS_SUCCESS)))
+            ->setDestination($this->Metadata->getSingleLogoutServiceURL()) // TODO: ?
+            ->setInResponseTo($LogoutRequest->getID())
+            ->setID(\LightSaml\Helper::generateID())
+            ->setIssueInstant(new \DateTime())
+            ->setIssuer(new Issuer($this->Metadata->getIssuer()))
+            ->setSignature(new SignatureWriter($this->Idp->getCertificate(), $this->Idp->getPrivateKey()));
+
+        // dump($response);
+
+        $bindingFactory = new BindingFactory();
+        $binding = $bindingFactory->create($this->Metadata->getSingleLogoutServiceBinding());
+
+        $messageContext = new MessageContext();
+        $messageContext->setBindingType($this->Metadata->getSingleLogoutServiceBinding());
+        $messageContext->setMessage($response)->asResponse();
+
+        /** @var \Symfony\Component\HttpFoundation\Response $httpResponse */
+        $httpResponse = $binding->send($messageContext);
+
+        // dump($httpResponse); exit;
+
+        return $httpResponse->getContent()."\n\n";
+    }
+
+    protected function handleSAMLLoginRequest()
+    {
+
+        $decoded = base64_decode($this->SAMLRequest, true);
         $xml = gzinflate($decoded);
 
         $deserializationContext = new DeserializationContext();
@@ -189,19 +249,15 @@ class Simple_SAML
             $this->Idp->authenticate($this->SAMLRequest, $this->RelayState);
         }
 
-        return $this->buildSAMLResponse($authnRequest);
-    }
-
-    protected function buildSAMLResponse(AuthnRequest $authnRequest) // , $request
-    {
         $response = new Response();
         $response
             ->addAssertion($assertion = new Assertion())
             ->setID(Helper::generateID())
+            ->setInResponseTo($authnRequest->getId())
             ->setIssueInstant(new DateTime())
             ->setDestination($this->Metadata->getAssertionConsumerServiceURL())
             ->setIssuer(new Issuer($this->Metadata->getIssuer()))
-            ->setStatus(new Status(new StatusCode('urn:oasis:names:tc:SAML:2.0:status:Success')))
+            ->setStatus(new Status(new StatusCode(SamlConstants::STATUS_SUCCESS)))
             ->setSignature(new SignatureWriter($this->Idp->getCertificate(), $this->Idp->getPrivateKey()));
 
         if ($this->RelayState) {
@@ -236,14 +292,14 @@ class Simple_SAML
                                 (new SubjectConfirmationData())
                                     ->setInResponseTo($authnRequest->getId())
                                     ->setNotOnOrAfter(new DateTime('+1 MINUTE'))
-                                    ->setRecipient($this->Metadata->getIdentifier())
+                                    ->setRecipient($this->Metadata->getAssertionConsumerServiceURL()) // was: getIdentifier()
                             )
                     )
             )
             ->setConditions(
                 (new Conditions())
                     ->setNotBefore(new DateTime())
-                    ->setNotOnOrAfter(new DateTime('+1 MINUTE'))
+                    ->setNotOnOrAfter(new DateTime('+2 HOURS'))
                     ->addItem(
                         new AudienceRestriction([$this->Metadata->getIdentifier()]) // getAssertionConsumerServiceURL()])
                     )
@@ -262,11 +318,6 @@ class Simple_SAML
             )
         ;
 
-        return $this->sendSAMLResponse($response);
-    }
-
-    public function sendSAMLResponse($response)
-    {
         $bindingFactory = new BindingFactory();
         $postBinding = $bindingFactory->create($this->Metadata->getAssertionConsumerServiceBinding());
         $messageContext = new MessageContext();
