@@ -1,5 +1,5 @@
 package: simple_saml
-version: '1.1'
+version: '1.2'
 
 page:
     title: 'translate:simple_saml'
@@ -8,10 +8,12 @@ page:
     subpages:
         profiles:
             title: 'translate:profiles'
-        readme:
-            title: 'translate:readme'
-            icon: rex-icon fa-info-circle
+        docs:
+            title: translate:readme
+            subPath: README.md
+            icon: rex-icon fa-book
             itemclass: pull-right
+
 
 requires:
     packages:

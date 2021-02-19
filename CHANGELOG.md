@@ -1,6 +1,15 @@
 Changelog
 =========
 
+Version 1.2 – 19.02.2021
+--------------------------
+
+- Fehler in lightsaml behoben, Codierung der Fehler war manchmal falsch 
+- ResponseId war nicht gesetzt
+- Darstellung der Profile angepasst
+- Readme.md nun in Standardredaxo Docu Ansicht
+- SAML Logout integriert
+- Diverse Kommentare entfernt
 
 Version 1.1 – 02.11.2020
 --------------------------
