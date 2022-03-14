@@ -1,6 +1,14 @@
 Changelog
 =========
 
+Version 1.3 – 14.03.2022
+--------------------------
+
+- User Logout löscht nun die Session
+- Falsche URLs werden nun abgefangen
+- Composer update
+
+
 Version 1.2 – 19.02.2021
 --------------------------
 
