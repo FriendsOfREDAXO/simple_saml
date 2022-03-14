@@ -63,17 +63,20 @@ class Simple_SAML
 
     public function init()
     {
-        self::$request = ServerRequest::fromGlobals();
-        $currentPathAsArray = explode('/', self::$request->getUri()->getPath());
-        if (!isset($currentPathAsArray[1]) || $currentPathAsArray[1] != self::$basePath ||
-            !\in_array($currentPathAsArray[2], self::$funcPaths, true) || !isset($currentPathAsArray[2]) ||
-            !isset($currentPathAsArray[3]) || '' == $currentPathAsArray[3]
-        ) {
+        try {
+            self::$request = ServerRequest::fromGlobals();
+            $currentPathAsArray = explode('/', self::$request->getUri()->getPath());
+            if (!isset($currentPathAsArray[1]) || $currentPathAsArray[1] != self::$basePath ||
+                !\in_array($currentPathAsArray[2], self::$funcPaths, true) || !isset($currentPathAsArray[2]) ||
+                !isset($currentPathAsArray[3]) || '' == $currentPathAsArray[3]
+            ) {
+                return false;
+            }
+        } catch (Exception $e) {
+            // if exception -> no correct simple saml url -> no exception
+            // rex_logger::logException($e);
             return false;
         }
-
-        $this->SAMLRequest = rex_request('SAMLRequest', 'string', null);
-        $this->RelayState = rex_request('RelayState', 'string', null);
 
         try {
             /* @var Metadata $Metadata */
