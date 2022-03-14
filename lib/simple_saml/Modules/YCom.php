@@ -61,6 +61,7 @@ class YCom extends AbstractModule
 
     public function logoutUser(Simple_SAML $simple_SAML)
     {
+        \rex_ycom_auth::clearUserSession();
         return true;
     }
 
