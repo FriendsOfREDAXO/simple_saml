@@ -14,9 +14,7 @@ page:
             icon: rex-icon fa-book
             itemclass: pull-right
 
-
 requires:
     packages:
-        yform: '^3'
         ycom: '^4'
     redaxo: '^5.11'
