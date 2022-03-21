@@ -78,6 +78,9 @@ class Simple_SAML
             return false;
         }
 
+        $this->SAMLRequest = rex_request('SAMLRequest', 'string', null);
+        $this->RelayState = rex_request('RelayState', 'string', null);
+
         try {
             /* @var Metadata $Metadata */
             $this->Metadata = Metadata::getByIdp($currentPathAsArray[3]);
