@@ -1,10 +1,7 @@
 <?php
 
-declare(strict_types=1);
-
 namespace REDAXO\Simple_SAML;
 
-use DateTime;
 use Exception;
 use GuzzleHttp\Psr7\ServerRequest;
 use LightSaml\Binding\BindingFactory;
@@ -35,44 +32,45 @@ use LightSaml\Model\Protocol\StatusCode;
 use LightSaml\Model\XmlDSig\SignatureStringReader;
 use LightSaml\Model\XmlDSig\SignatureWriter;
 use LightSaml\SamlConstants;
-use REDAXO\Simple_SAML\Modules\AbstractModule;
-use rex_logger;
+use Psr\Http\Message\ServerRequestInterface;
 use RobRichards\XMLSecLibs\XMLSecurityKey;
 
 class Simple_SAML
 {
-    /** @var ServerRequest */
-    public static $request;
+    /** @var ServerRequest|ServerRequestInterface */
+    private static $request;
     public static $basePath = 'saml';
     public static $metadataPath = 'metadata';
     public static $sloPath = 'slo';
-    public static $slsPath = 'sls';
+    private static $slsPath = 'sls';
     public static $ssoPath = 'sso';
-    public static $funcPaths = ['metadata', 'slo', 'sls', 'sso'];
-    public $SAMLRequest;
-    public $RelayState;
-    /** @var Metadata->Metadata */
-    public $Metadata;
-    /** @var AbstractModule->Idp */
-    public $Idp;
+    private static $funcPaths = ['metadata', 'slo', 'sls', 'sso'];
+    private $SAMLRequest;
+    private $RelayState;
+    private $Metadata;
+    private $Idp;
 
     public static function factory()
     {
         return new self();
     }
 
+    /** @api */
     public function init()
     {
         try {
             self::$request = ServerRequest::fromGlobals();
             $currentPathAsArray = explode('/', self::$request->getUri()->getPath());
-            if (!isset($currentPathAsArray[1]) || $currentPathAsArray[1] != self::$basePath ||
-                !\in_array($currentPathAsArray[2], self::$funcPaths, true) || !isset($currentPathAsArray[2]) ||
-                !isset($currentPathAsArray[3]) || '' == $currentPathAsArray[3]
+            if (!isset($currentPathAsArray[1])
+                || $currentPathAsArray[1] !== self::$basePath
+                || !isset($currentPathAsArray[2])
+                || !\in_array($currentPathAsArray[2], self::$funcPaths, true)
+                || !isset($currentPathAsArray[3])
+                || '' === $currentPathAsArray[3]
             ) {
                 return false;
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             // if exception -> no correct simple saml url -> no exception
             // rex_logger::logException($e);
             return false;
@@ -97,7 +95,7 @@ class Simple_SAML
             switch ($currentPathAsArray[2]) {
                 case self::$sloPath: // TODO: init Logout processs with returnTo or redirect from idp
                 case self::$slsPath: // TODO: process Logout without returnTo
-                    if ($this->SAMLRequest) {
+                    if ('' !== $this->SAMLRequest) {
                         echo $this->handleSAMLLogoutRequest();
                     }
 
@@ -107,7 +105,7 @@ class Simple_SAML
 
                     break;
                 case self::$ssoPath:
-                    if ($this->SAMLRequest) {
+                    if ('' !== $this->SAMLRequest) {
                         echo $this->handleSAMLLoginRequest();
                     }
 
@@ -115,7 +113,7 @@ class Simple_SAML
             }
             exit;
         } catch (\Exception $e) {
-            rex_logger::logException($e);
+            \rex_logger::logException($e);
             return false;
         }
     }
@@ -139,18 +137,18 @@ class Simple_SAML
                 ->setUse(\LightSaml\Model\Metadata\KeyDescriptor::USE_SIGNING)
                 ->setCertificate($this->Idp->getCertificate())
         );
-
-        $IpdSsoDescriptor->addSingleLogoutService(
-            $keyDescriptor = (new SingleLogoutService())
-                ->setLocation($this->Idp->getSLOUrl())
-                ->setBinding($this->Idp->getsingleSignOutServiceBinding())
-        );
-
-        $IpdSsoDescriptor->addSingleSignOnService(
-            $keyDescriptor = (new SingleSignOnService())
-                ->setLocation($this->Idp->getSSOUrl())
-                ->setBinding($this->Idp->getsingleSignOnServiceBinding())
-        );
+        //
+        // $IpdSsoDescriptor->addSingleLogoutService(
+        //     $keyDescriptor = (new SingleLogoutService())
+        //         ->setLocation($this->Idp->getSLOUrl())
+        //         ->setBinding($this->Idp->getsingleSignOutServiceBinding())
+        // );
+        //
+        // $IpdSsoDescriptor->addSingleSignOnService(
+        //     $keyDescriptor = (new SingleSignOnService())
+        //         ->setLocation($this->Idp->getSSOUrl())
+        //         ->setBinding($this->Idp->getsingleSignOnServiceBinding())
+        // );
 
         // TODO: NameIdFormat
 
@@ -184,10 +182,16 @@ class Simple_SAML
         // dump($this->SAMLRequest); dump($LogoutRequest);
 
         $response = new LogoutResponse();
+        $response = $response
+            ->setRelayState($LogoutRequest->getRelayState());
+
+        /** @var LogoutResponse $response */
         $response
-            ->setRelayState($LogoutRequest->getRelayState())
             ->setStatus(new Status(new StatusCode(SamlConstants::STATUS_SUCCESS)))
-            ->setDestination($this->Metadata->getSingleLogoutServiceURL()) // TODO: ?
+            ->setDestination($this->Metadata->getSingleLogoutServiceURL());
+
+        /** @var LogoutResponse $response */
+        $response
             ->setInResponseTo($LogoutRequest->getID())
             ->setID(\LightSaml\Helper::generateID())
             ->setIssueInstant(new \DateTime())
@@ -222,7 +226,7 @@ class Simple_SAML
         $authnRequest->deserialize($deserializationContext->getDocument()->firstChild, $deserializationContext);
 
         if (!$this->Idp) {
-            throw new Exception('Identify Provider Module not found');
+            throw new \Exception('Identify Provider Module not found');
         }
 
         // Check Request Signature
@@ -236,8 +240,9 @@ class Simple_SAML
             $SignatureString = \rex_request::get('Signature', 'string', null);
 
             $msg = [];
+            /** @phpstan-ignore-next-line */
             foreach ($_REQUEST as $k => $r) {
-                if ('Signature' != $k) {
+                if ('Signature' !== $k) {
                     $msg[] = $k.'='.urlencode($r);
                 }
             }
@@ -254,11 +259,17 @@ class Simple_SAML
         $response = new Response();
         $response
             ->addAssertion($assertion = new Assertion())
-            ->setID(Helper::generateID())
-            ->setInResponseTo($authnRequest->getId())
-            ->setIssueInstant(new DateTime())
+            ->setID(Helper::generateID());
+
+        /** @var Response $response */
+        $response
+            ->setInResponseTo($authnRequest->getID())
+            ->setIssueInstant(new \DateTime())
             ->setDestination($this->Metadata->getAssertionConsumerServiceURL())
-            ->setIssuer(new Issuer($this->Metadata->getIssuer()))
+            ->setIssuer(new Issuer($this->Metadata->getIssuer()));
+
+        /** @var Response $response */
+        $response
             ->setStatus(new Status(new StatusCode(SamlConstants::STATUS_SUCCESS)))
             ->setSignature(new SignatureWriter($this->Idp->getCertificate(), $this->Idp->getPrivateKey()));
 
@@ -283,7 +294,7 @@ class Simple_SAML
 
         $assertion
             ->setId(Helper::generateID())
-            ->setIssueInstant(new DateTime())
+            ->setIssueInstant(new \DateTime())
             ->setIssuer(new Issuer($this->Metadata->getIssuer()))
             ->setSubject(
                 $subject
@@ -292,16 +303,16 @@ class Simple_SAML
                             ->setMethod(SamlConstants::CONFIRMATION_METHOD_BEARER)
                             ->setSubjectConfirmationData(
                                 (new SubjectConfirmationData())
-                                    ->setInResponseTo($authnRequest->getId())
-                                    ->setNotOnOrAfter(new DateTime('+1 MINUTE'))
+                                    ->setInResponseTo($authnRequest->getID())
+                                    ->setNotOnOrAfter(new \DateTime('+1 MINUTE'))
                                     ->setRecipient($this->Metadata->getAssertionConsumerServiceURL()) // was: getIdentifier()
                             )
                     )
             )
             ->setConditions(
                 (new Conditions())
-                    ->setNotBefore(new DateTime())
-                    ->setNotOnOrAfter(new DateTime('+2 HOURS'))
+                    ->setNotBefore(new \DateTime())
+                    ->setNotOnOrAfter(Helper::getTimestampFromValue(new \DateTime('+2 HOURS')))
                     ->addItem(
                         new AudienceRestriction([$this->Metadata->getIdentifier()]) // getAssertionConsumerServiceURL()])
                     )
@@ -335,11 +346,11 @@ class Simple_SAML
     {
         $decoded = base64_decode((string) $this->SAMLRequest, true);
         if (false === $decoded) {
-            throw new Exception('SAMLRequest not valid');
+            throw new \Exception('SAMLRequest not valid');
         }
         $xml = gzinflate($decoded);
         if (false === $xml) {
-            throw new Exception('GZInflate of SAMLRequest failed');
+            throw new \Exception('GZInflate of SAMLRequest failed');
         }
         return $xml;
     }

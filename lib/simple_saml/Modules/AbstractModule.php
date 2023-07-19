@@ -7,6 +7,7 @@ use REDAXO\Simple_SAML\Simple_SAML;
 
 abstract class AbstractModule
 {
+    /** @api */
     public static $key = 'default';
 
     /**
@@ -19,6 +20,7 @@ abstract class AbstractModule
         $this->data = $data;
     }
 
+    /** @api */
     public function addData($data)
     {
         $this->data = $data;
@@ -51,6 +53,7 @@ abstract class AbstractModule
         return 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect';
     }
 
+    /** @api */
     public function logoutUser(\REDAXO\Simple_SAML\Simple_SAML $simple_SAML)
     {
         return true;
@@ -60,8 +63,10 @@ abstract class AbstractModule
 
     abstract public function getPrivateKey();
 
+    /** @api */
     abstract public function getClaimValue(string $claim);
 
+    /** @api */
     abstract public function getSubject(string $format, \LightSaml\Model\Protocol\NameIDPolicy $NameIDPolicy);
 
     public function getIdentifier()
@@ -74,7 +79,9 @@ abstract class AbstractModule
         return static::$key;
     }
 
+    /** @api */
     abstract public function authenticate(string $SAMLRequest, string $RelayState);
 
+    /** @api */
     abstract public function isAuthenticated();
 }

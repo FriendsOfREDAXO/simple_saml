@@ -6,7 +6,10 @@
     "replace": {
         "psr/container": "*",
         "psr/http-message": "*",
-        "psr/log": "*"
+        "psr/log": "*",
+        "symfony/http-foundation": "*",
+        "symfony/polyfill-php80": "*",
+        "symfony/deprecation-contracts": "*"
     },
     "scripts": {
         "post-install-cmd": [

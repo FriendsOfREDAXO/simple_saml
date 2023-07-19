@@ -33,7 +33,7 @@ class YCom extends AbstractModule
         return $this->data['entityId'];
     }
 
-    public function getSubject($format, $nameIDPolicy)
+    public function getSubject($format, $NameIDPolicy)
     {
         // Todo: createAllowed
         switch ($format) {
@@ -67,9 +67,9 @@ class YCom extends AbstractModule
 
     public function getClaimValue($claim)
     {
-        /** @var \rex_yform_manager_dataset $user */
+        /** @var \rex_ycom_user|null $user */
         $user = \rex_ycom_user::getMe();
-        if (!$user) {
+        if (null === $user) {
             return false;
         }
 
@@ -78,21 +78,16 @@ class YCom extends AbstractModule
             case ClaimTypes::NAME:
                 $name = [$user->getValue('firstname'), $user->getValue('name')];
                 return implode(' ', $name);
-                break;
             case ClaimTypes::ADFS_1_EMAIL:
             case ClaimTypes::EMAIL_ADDRESS:
                 return $user->getValue('email');
-                break;
             case ClaimTypes::GIVEN_NAME:
                 return $user->getValue('firstname');
-                break;
             case ClaimTypes::SURNAME:
                 return $user->getValue('name');
-                break;
             case ClaimTypes::ADFS_1_UPN:
             case ClaimTypes::UPN:
                 return $user->getValue('login');
-                break;
             case ClaimTypes::ROLE:
             case ClaimTypes::GROUP:
                 $groups = [];
@@ -100,11 +95,9 @@ class YCom extends AbstractModule
                     $groups[] = $group->getId();
                 }
                 return $groups;
-                break;
             case ClaimTypes::NAME_ID:
             case ClaimTypes::PPID:
                 return $user->getValue('id');
-                break;
             case ClaimTypes::AUTHENTICATION_TIMESTAMP:
                 return (new \DateTime())->format(DATE_ATOM);
         }
@@ -122,8 +115,8 @@ class YCom extends AbstractModule
 
         $returnToUrl = $url.'?'.http_build_query($urlParams, '', '&');
 
-        $login_id = \rex_config::get('ycom/auth', 'article_id_login');
-        if (!$login_id) {
+        $login_id = (int) \rex_config::get('ycom/auth', 'article_id_login');
+        if (1 > $login_id) {
             throw new \Exception('YCom - LoginId is not defined');
         }
 
@@ -138,6 +131,6 @@ class YCom extends AbstractModule
 
     public function isAuthenticated()
     {
-        return (\rex_ycom_user::getMe()) ? true : false;
+        return (null === \rex_ycom_user::getMe()) ? true : false;
     }
 }

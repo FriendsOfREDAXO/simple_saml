@@ -1,9 +1,8 @@
 <?php
 
-declare(strict_types=1);
-
 $idp_id = rex_request('idp_id', 'string', null);
 $Metadatas = \REDAXO\Simple_SAML\Metadata::getAll();
+$mainContent = [];
 
 $content = '';
 $content = '<table class="table table-hover">';
@@ -21,7 +20,7 @@ foreach ($Metadatas as $Metadata) {
 $content .= '</tbody>';
 $content .= '</table>';
 
-if (0 == count($Metadatas)) {
+if (0 === count($Metadatas)) {
     $content .= rex_view::info(rex_i18n::msg('simple_saml_no_metadatas_found'));
 }
 

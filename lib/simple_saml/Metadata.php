@@ -22,6 +22,7 @@ class Metadata
         return $this->data['entityId'] ?? null;
     }
 
+    /** @api */
     public function getCertificate()
     {
         if (!isset($this->data['x509cert'])) {
@@ -36,6 +37,7 @@ class Metadata
         }
     }
 
+    /** @api */
     public function getSignMetadata()
     {
         if (!isset($this->data['signMetadata'])) {
@@ -60,7 +62,7 @@ class Metadata
 
     public function getAssertionConsumerServiceBinding()
     {
-        if (SamlConstants::BINDING_SAML2_HTTP_POST != $this->data['AssertionConsumerService']['binding']) {
+        if (SamlConstants::BINDING_SAML2_HTTP_POST !== $this->data['AssertionConsumerService']['binding']) {
             throw new \Exception('Only '.SamlConstants::BINDING_SAML2_HTTP_POST.' is supported');
         }
 
@@ -76,15 +78,16 @@ class Metadata
         return $this->data['NameIDFormat'];
     }
 
+    /** @api */
     public function getInfoArray()
     {
         /** @var AbstractModule $Idp */
         $Idp = $this->getIdp();
 
-        /** @var X509Certificate $cert */
+        /** @var X509Certificate|null $cert */
         $cert = $Idp->getCertificate();
         $x509cert = '';
-        if ($cert) {
+        if (null !== $cert) {
             $x509cert = $this->data['idp']['x509cert'];
         }
         $private = ($Idp->getPrivateKey()) ? 'exists' : 'missing';
@@ -112,14 +115,16 @@ class Metadata
         ];
     }
 
+    /** @api */
     public function getSingleLogoutServiceURL()
     {
         return $this->data['singleLogoutService']['url'];
     }
 
+    /** @api */
     public function getSingleLogoutServiceBinding()
     {
-        if (SamlConstants::BINDING_SAML2_HTTP_REDIRECT != $this->data['singleLogoutService']['binding']) {
+        if (SamlConstants::BINDING_SAML2_HTTP_REDIRECT !== $this->data['singleLogoutService']['binding']) {
             throw new \Exception('Only '.SamlConstants::BINDING_SAML2_HTTP_REDIRECT.' is supported');
         }
         return SamlConstants::BINDING_SAML2_HTTP_REDIRECT;
@@ -130,11 +135,13 @@ class Metadata
         return $this->data['idp']['Claims'] ?? [ClaimTypes::EMAIL_ADDRESS, ClaimTypes::COMMON_NAME];
     }
 
+    /** @api */
     public function getIssuer()
     {
         return $this->getIdp()->getEntityUrl();
     }
 
+    /** @api */
     public static function addMetadata($metadata)
     {
         self::$metadata[] = $metadata;
@@ -145,11 +152,12 @@ class Metadata
         return self::$metadata;
     }
 
+    /** @api */
     public static function get(string $identifier)
     {
         // try via identifier
         foreach (self::$metadata as $md) {
-            if ($identifier == $md->getIdentifier()) {
+            if ($identifier === $md->getIdentifier()) {
                 return $md;
             }
         }
@@ -160,7 +168,7 @@ class Metadata
     {
         // try via identifier
         foreach (self::$metadata as $md) {
-            if ($identifier == $md->getIdp()->getIdentifier()) {
+            if ($identifier === $md->getIdp()->getIdentifier()) {
                 return $md;
             }
         }
