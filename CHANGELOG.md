@@ -1,6 +1,8 @@
 Changelog
 =========
 
+.. Wechsel zu Releases innerhalb von Github.
+
 Version 1.3 – 14.03.2022
 --------------------------
 
