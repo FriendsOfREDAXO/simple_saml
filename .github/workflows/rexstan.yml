@@ -72,6 +72,8 @@ jobs:
           redaxo_cms/redaxo/bin/console package:install 'rexstan'
           redaxo_cms/redaxo/bin/console install:download 'yform' '4.*'
           redaxo_cms/redaxo/bin/console package:install 'yform'
+          redaxo_cms/redaxo/bin/console install:download 'yrewrite' '>=2.6'
+          redaxo_cms/redaxo/bin/console package:install 'yrewrite'
           redaxo_cms/redaxo/bin/console install:download 'ycom' '4.*'
           redaxo_cms/redaxo/bin/console package:install 'ycom'
           redaxo_cms/redaxo/bin/console package:install 'cronjob'
