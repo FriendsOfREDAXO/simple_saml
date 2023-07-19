@@ -42,7 +42,7 @@ use RobRichards\XMLSecLibs\XMLSecurityKey;
 class Simple_SAML
 {
     /** @var ServerRequest */
-    public static $request = null;
+    public static $request;
     public static $basePath = 'saml';
     public static $metadataPath = 'metadata';
     public static $sloPath = 'slo';
@@ -51,9 +51,9 @@ class Simple_SAML
     public static $funcPaths = ['metadata', 'slo', 'sls', 'sso'];
     public $SAMLRequest;
     public $RelayState;
-    /** @var Metadata $this->Metadata */
+    /** @var Metadata->Metadata */
     public $Metadata;
-    /** @var AbstractModule $this->Idp */
+    /** @var AbstractModule->Idp */
     public $Idp;
 
     public static function factory()
@@ -116,8 +116,7 @@ class Simple_SAML
             exit;
         } catch (\Exception $e) {
             rex_logger::logException($e);
-
-            exit;
+            return false;
         }
     }
 
@@ -166,8 +165,7 @@ class Simple_SAML
 
     protected function handleSAMLLogoutRequest()
     {
-        $decoded = base64_decode($this->SAMLRequest, true);
-        $xml = gzinflate($decoded);
+        $xml = $this->getXMLFromRequest();
 
         $deserializationContext = new DeserializationContext();
         $deserializationContext->getDocument()->loadXML($xml);
@@ -215,9 +213,7 @@ class Simple_SAML
 
     protected function handleSAMLLoginRequest()
     {
-
-        $decoded = base64_decode($this->SAMLRequest, true);
-        $xml = gzinflate($decoded);
+        $xml = $this->getXMLFromRequest();
 
         $deserializationContext = new DeserializationContext();
         $deserializationContext->getDocument()->loadXML($xml);
@@ -290,7 +286,7 @@ class Simple_SAML
             ->setIssueInstant(new DateTime())
             ->setIssuer(new Issuer($this->Metadata->getIssuer()))
             ->setSubject(
-                    $subject
+                $subject
                     ->addSubjectConfirmation(
                         (new SubjectConfirmation())
                             ->setMethod(SamlConstants::CONFIRMATION_METHOD_BEARER)
@@ -333,5 +329,18 @@ class Simple_SAML
         $httpResponse = $postBinding->send($messageContext);
 
         return $httpResponse->getContent()."\n\n";
+    }
+
+    private function getXMLFromRequest()
+    {
+        $decoded = base64_decode((string) $this->SAMLRequest, true);
+        if (false === $decoded) {
+            throw new Exception('SAMLRequest not valid');
+        }
+        $xml = gzinflate($decoded);
+        if (false === $xml) {
+            throw new Exception('GZInflate of SAMLRequest failed');
+        }
+        return $xml;
     }
 }
