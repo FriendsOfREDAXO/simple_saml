@@ -131,6 +131,6 @@ class YCom extends AbstractModule
 
     public function isAuthenticated()
     {
-        return (null === \rex_ycom_user::getMe()) ? true : false;
+        return (null !== \rex_ycom_user::getMe()) ? true : false;
     }
 }
