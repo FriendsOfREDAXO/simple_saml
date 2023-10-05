@@ -1,5 +1,5 @@
 package: simple_saml
-version: '1.4'
+version: '1.5'
 
 page:
     title: 'translate:simple_saml'
