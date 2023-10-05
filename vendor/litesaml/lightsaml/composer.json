@@ -1,0 +1,59 @@
+{
+    "name": "litesaml/lightsaml",
+    "license": "MIT",
+    "type": "library",
+    "description": "SAML 2.0 PHP library",
+    "keywords": ["SAML 2.0", "PHP", "library", "lightSAML", "Single SignOn", "Single Logout"],
+    "authors": [
+        {
+            "name": "William",
+            "email": "work@suppo.fr"
+        },
+        {
+            "name": "Milos Tomic",
+            "email": "tmilos@gmail.com",
+            "homepage": "https://github.com/tmilos/",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/litesaml/lightsaml/issues",
+        "source": "https://github.com/litesaml/lightsaml",
+        "docs": "https://docs.litesaml.com"
+    },
+    "autoload": {
+        "psr-4": {
+            "LightSaml\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "LightSaml\\Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "php": ">=7.4",
+        "robrichards/xmlseclibs": "~2.0|~3.0|~4.0",
+        "symfony/http-foundation": "~5.0|~6.0",
+        "psr/event-dispatcher": "^1.0"
+    },
+    "require-dev": {
+        "symfony/dom-crawler": "~5.0|~6.0",
+        "symfony/css-selector": "~5.0|~6.0",
+        "pimple/pimple": "~3.0",
+        "phpunit/phpunit": "~8.4|~9.5",
+        "monolog/monolog": "^2.0|^3.0",
+        "squizlabs/php_codesniffer": "^3.6",
+        "litesaml/schemas": "~1.0.0",
+        "phpstan/phpstan": "^1.8",
+        "marcocesarato/php-conventional-changelog": "^1.15"
+    },
+    "prefer-stable": true,
+    "minimum-stability": "stable",
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "phpcs": "vendor/bin/phpcs --standard=PSR12 --exclude=Generic.Files.LineLength ./src",
+        "phpstan": "vendor/bin/phpstan analyse --memory-limit 512M --ansi",
+        "tag": "vendor/bin/conventional-changelog --commit"
+    }
+}

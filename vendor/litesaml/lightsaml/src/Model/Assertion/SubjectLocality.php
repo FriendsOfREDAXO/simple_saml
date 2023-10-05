@@ -1,0 +1,78 @@
+<?php
+
+namespace LightSaml\Model\Assertion;
+
+use LightSaml\Model\AbstractSamlModel;
+use LightSaml\Model\Context\DeserializationContext;
+use LightSaml\Model\Context\SerializationContext;
+use LightSaml\SamlConstants;
+
+class SubjectLocality extends AbstractSamlModel
+{
+    /**
+     * @var string
+     */
+    protected $address;
+
+    /**
+     * @var string
+     */
+    protected $dnsName;
+
+    /**
+     * @param string $address
+     *
+     * @return SubjectLocality
+     */
+    public function setAddress($address)
+    {
+        $this->address = $address;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAddress()
+    {
+        return $this->address;
+    }
+
+    /**
+     * @param string $dnsName
+     *
+     * @return SubjectLocality
+     */
+    public function setDNSName($dnsName)
+    {
+        $this->dnsName = $dnsName;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDNSName()
+    {
+        return $this->dnsName;
+    }
+
+    /**
+     * @return void
+     */
+    public function serialize(\DOMNode $parent, SerializationContext $context)
+    {
+        $result = $this->createElement('SubjectLocality', SamlConstants::NS_ASSERTION, $parent, $context);
+
+        $this->attributesToXml(['Address', 'DNSName'], $result);
+    }
+
+    public function deserialize(\DOMNode $node, DeserializationContext $context)
+    {
+        $this->checkXmlNodeName($node, 'SubjectLocality', SamlConstants::NS_ASSERTION);
+
+        $this->attributesFromXml($node, ['Address', 'DNSName']);
+    }
+}
