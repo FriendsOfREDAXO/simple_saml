@@ -2,7 +2,7 @@
 
 Über dieses AddOn können 3rd Party Applikationen die YCom als Identity Provider nutzen, so dass man keine weiteren Logins anlegen muss und die YCom als SingleSignOn Server verwendet werden kann.
 
-Es wird die Bibliothek lightSAML genutzt: https://github.com/lightSAML/lightSAML
+Es wird die Bibliothek lightSAML genutzt: https://github.com/litesaml/lightsaml
 
 Dabei tauchen folgende Begriffe häufig auf die wichtig sind, um zu verstehen wie man das System richtig aufsetzt.
 
