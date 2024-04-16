@@ -1,6 +1,5 @@
 {
     "require": {
-        "guzzlehttp/psr7": "^2",
         "litesaml/lightsaml": "^4.1"
     },
     "replace": {

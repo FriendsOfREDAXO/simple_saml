@@ -2,6 +2,7 @@
 
 namespace REDAXO\Simple_SAML;
 
+use Exception;
 use LightSaml\ClaimTypes;
 use LightSaml\Credential\X509Certificate;
 use LightSaml\SamlConstants;
@@ -32,8 +33,8 @@ class Metadata
             $cert = new X509Certificate();
             $cert->loadPem($this->data['x509cert']);
             return $cert;
-        } catch (\Exception $e) {
-            throw new \Exception('SAML SP Certificate Error '. $e->getMessage());
+        } catch (Exception $e) {
+            throw new Exception('SAML SP Certificate Error ' . $e->getMessage());
         }
     }
 
@@ -49,7 +50,7 @@ class Metadata
     public function getIdp()
     {
         $idpData = $this->data['idp'];
-        $idp = "\REDAXO\Simple_SAML\Modules\\".$idpData['AuthModule'];
+        $idp = '\\REDAXO\\Simple_SAML\\Modules\\' . $idpData['AuthModule'];
         $idpObject = new $idp();
         $idpObject->addData($idpData);
         return $idpObject;
@@ -63,7 +64,7 @@ class Metadata
     public function getAssertionConsumerServiceBinding()
     {
         if (SamlConstants::BINDING_SAML2_HTTP_POST !== $this->data['AssertionConsumerService']['binding']) {
-            throw new \Exception('Only '.SamlConstants::BINDING_SAML2_HTTP_POST.' is supported');
+            throw new Exception('Only ' . SamlConstants::BINDING_SAML2_HTTP_POST . ' is supported');
         }
 
         return SamlConstants::BINDING_SAML2_HTTP_POST;
@@ -72,7 +73,7 @@ class Metadata
     public function getNameIDFormat()
     {
         if (!isset($this->data['NameIDFormat'])) {
-            throw new \Exception('NameIDFormat in Metadata is missing');
+            throw new Exception('NameIDFormat in Metadata is missing');
         }
 
         return $this->data['NameIDFormat'];
@@ -125,7 +126,7 @@ class Metadata
     public function getSingleLogoutServiceBinding()
     {
         if (SamlConstants::BINDING_SAML2_HTTP_REDIRECT !== $this->data['singleLogoutService']['binding']) {
-            throw new \Exception('Only '.SamlConstants::BINDING_SAML2_HTTP_REDIRECT.' is supported');
+            throw new Exception('Only ' . SamlConstants::BINDING_SAML2_HTTP_REDIRECT . ' is supported');
         }
         return SamlConstants::BINDING_SAML2_HTTP_REDIRECT;
     }
@@ -161,7 +162,7 @@ class Metadata
                 return $md;
             }
         }
-        throw new \Exception('Service Provider not found with this identifier '. $identifier);
+        throw new Exception('Service Provider not found with this identifier ' . $identifier);
     }
 
     public static function getByIdp(string $identifier)
@@ -172,6 +173,6 @@ class Metadata
                 return $md;
             }
         }
-        throw new \Exception('Identity Provider not found with this identifier '. $identifier);
+        throw new Exception('Identity Provider not found with this identifier ' . $identifier);
     }
 }

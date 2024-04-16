@@ -2,7 +2,8 @@
 
 namespace REDAXO\Simple_SAML\Modules;
 
-use GuzzleHttp\Psr7\ServerRequest;
+use DateTime;
+use Exception;
 use LightSaml\ClaimTypes;
 use LightSaml\Credential\KeyHelper;
 use LightSaml\Credential\X509Certificate;
@@ -10,6 +11,13 @@ use LightSaml\Model\Assertion\NameID;
 use LightSaml\Model\Assertion\Subject;
 use LightSaml\SamlConstants;
 use REDAXO\Simple_SAML\Simple_SAML;
+use rex;
+use rex_config;
+use rex_response;
+use rex_ycom_auth;
+use rex_ycom_user;
+
+use const DATE_ATOM;
 
 class YCom extends AbstractModule
 {
@@ -39,36 +47,36 @@ class YCom extends AbstractModule
         switch ($format) {
             case SamlConstants::NAME_ID_FORMAT_UNSPECIFIED: // Sp knows the format - individual
             case SamlConstants::NAME_ID_FORMAT_EMAIL: // email
-                $value = \rex_ycom_user::getMe()->getValue('email');
+                $value = rex_ycom_user::getMe()->getValue('email');
                 break;
             case SamlConstants::NAME_ID_FORMAT_PERSISTENT: // persistent id. here: could be login OR email
-                $value = \rex_ycom_user::getMe()->getValue('email');
+                $value = rex_ycom_user::getMe()->getValue('email');
                 break;
             case SamlConstants::NAME_ID_FORMAT_TRANSIENT: // no info about identity
-                $value = \rex_ycom_user::getMe()->getValue('email');
+                $value = rex_ycom_user::getMe()->getValue('email');
                 break;
             default:
                 $format = SamlConstants::NAME_ID_FORMAT_UNSPECIFIED;
-                $value = \rex_ycom_user::getMe()->getValue('email');
+                $value = rex_ycom_user::getMe()->getValue('email');
         }
 
         return (new Subject())
             ->setNameID(new NameID(
                 $value,
-                $format
+                $format,
             ));
     }
 
     public function logoutUser(Simple_SAML $simple_SAML)
     {
-        \rex_ycom_auth::clearUserSession();
+        rex_ycom_auth::clearUserSession();
         return true;
     }
 
     public function getClaimValue($claim)
     {
-        /** @var \rex_ycom_user|null $user */
-        $user = \rex_ycom_user::getMe();
+        /** @var rex_ycom_user|null $user */
+        $user = rex_ycom_user::getMe();
         if (null === $user) {
             return false;
         }
@@ -99,7 +107,7 @@ class YCom extends AbstractModule
             case ClaimTypes::PPID:
                 return $user->getValue('id');
             case ClaimTypes::AUTHENTICATION_TIMESTAMP:
-                return (new \DateTime())->format(DATE_ATOM);
+                return (new DateTime())->format(DATE_ATOM);
         }
         return false;
     }
@@ -113,24 +121,25 @@ class YCom extends AbstractModule
             $urlParams['RelayState'] = $RelayState;
         }
 
-        $returnToUrl = $url.'?'.http_build_query($urlParams, '', '&');
+        $returnToUrl = $url . '?' . http_build_query($urlParams, '', '&');
 
-        $login_id = (int) \rex_config::get('ycom/auth', 'article_id_login');
+        $login_id = (int) rex_config::get('ycom/auth', 'article_id_login');
         if (1 > $login_id) {
-            throw new \Exception('YCom - LoginId is not defined');
+            throw new Exception('YCom - LoginId is not defined');
         }
 
         $loginUrl = rex_getUrl($login_id, '', [
             'returnTo' => $returnToUrl,
         ], '&');
 
-        $loginUrl = ServerRequest::fromGlobals()->getUri()->getScheme().'://'.ServerRequest::fromGlobals()->getUri()->getHost().$loginUrl;
+        $request = rex::getRequest();
+        $loginUrl = $request->getScheme() . '://' . $request->getHost() . $loginUrl;
 
-        \rex_response::sendRedirect($loginUrl);
+        rex_response::sendRedirect($loginUrl);
     }
 
     public function isAuthenticated()
     {
-        return (null !== \rex_ycom_user::getMe()) ? true : false;
+        return (null !== rex_ycom_user::getMe()) ? true : false;
     }
 }

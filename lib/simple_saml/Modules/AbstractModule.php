@@ -2,17 +2,16 @@
 
 namespace REDAXO\Simple_SAML\Modules;
 
-use GuzzleHttp\Psr7\ServerRequest;
+use LightSaml\Model\Protocol\NameIDPolicy;
 use REDAXO\Simple_SAML\Simple_SAML;
+use rex;
 
 abstract class AbstractModule
 {
     /** @api */
     public static $key = 'default';
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $data;
 
     public function __construct(array $data = [])
@@ -28,17 +27,20 @@ abstract class AbstractModule
 
     public function getEntityUrl()
     {
-        return ServerRequest::fromGlobals()->getUri()->getScheme().'://'.ServerRequest::fromGlobals()->getUri()->getHost().'/'.Simple_SAML::$basePath.'/'.Simple_SAML::$metadataPath.'/'.$this->getIdentifier();
+        $request = rex::getRequest();
+        return $request->getScheme() . '://' . $request->getHost() . '/' . Simple_SAML::$basePath . '/' . Simple_SAML::$metadataPath . '/' . $this->getIdentifier();
     }
 
     public function getSSOUrl()
     {
-        return ServerRequest::fromGlobals()->getUri()->getScheme().'://'.ServerRequest::fromGlobals()->getUri()->getHost().'/'.Simple_SAML::$basePath.'/'.Simple_SAML::$ssoPath.'/'.$this->getIdentifier();
+        $request = rex::getRequest();
+        return $request->getScheme() . '://' . $request->getHost() . '/' . Simple_SAML::$basePath . '/' . Simple_SAML::$ssoPath . '/' . $this->getIdentifier();
     }
 
     public function getSLOUrl()
     {
-        return ServerRequest::fromGlobals()->getUri()->getScheme().'://'.ServerRequest::fromGlobals()->getUri()->getHost().'/'.Simple_SAML::$basePath.'/'.Simple_SAML::$sloPath.'/'.$this->getIdentifier();
+        $request = rex::getRequest();
+        return $request->getScheme() . '://' . $request->getHost() . '/' . Simple_SAML::$basePath . '/' . Simple_SAML::$sloPath . '/' . $this->getIdentifier();
     }
 
     public function getsingleSignOnServiceBinding()
@@ -54,7 +56,7 @@ abstract class AbstractModule
     }
 
     /** @api */
-    public function logoutUser(\REDAXO\Simple_SAML\Simple_SAML $simple_SAML)
+    public function logoutUser(Simple_SAML $simple_SAML)
     {
         return true;
     }
@@ -67,7 +69,7 @@ abstract class AbstractModule
     abstract public function getClaimValue(string $claim);
 
     /** @api */
-    abstract public function getSubject(string $format, \LightSaml\Model\Protocol\NameIDPolicy $NameIDPolicy);
+    abstract public function getSubject(string $format, NameIDPolicy $NameIDPolicy);
 
     public function getIdentifier()
     {
