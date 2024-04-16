@@ -68,6 +68,7 @@ class Simple_SAML
     {
         try {
             self::$request = rex::getRequest();
+            $currentPathAsArray = explode('/', self::$request->getPathInfo());
 
             if (!isset($currentPathAsArray[1])
                 || $currentPathAsArray[1] !== self::$basePath
