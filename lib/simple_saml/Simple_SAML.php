@@ -4,7 +4,6 @@ namespace REDAXO\Simple_SAML;
 
 use DateTime;
 use Exception;
-use http\Env\Request;
 use LightSaml\Binding\BindingFactory;
 use LightSaml\Context\Profile\MessageContext;
 use LightSaml\Credential\KeyHelper;
@@ -25,8 +24,6 @@ use LightSaml\Model\Context\SerializationContext;
 use LightSaml\Model\Metadata\EntityDescriptor;
 use LightSaml\Model\Metadata\IdpSsoDescriptor;
 use LightSaml\Model\Metadata\KeyDescriptor;
-use LightSaml\Model\Metadata\SingleLogoutService;
-use LightSaml\Model\Metadata\SingleSignOnService;
 use LightSaml\Model\Protocol\AuthnRequest;
 use LightSaml\Model\Protocol\LogoutRequest;
 use LightSaml\Model\Protocol\LogoutResponse;
@@ -40,12 +37,13 @@ use rex;
 use rex_logger;
 use rex_request;
 use RobRichards\XMLSecLibs\XMLSecurityKey;
+use Symfony\Component\HttpFoundation\Request;
 
 use function in_array;
 
 class Simple_SAML
 {
-    /** @var \Symfony\Component\HttpFoundation\Request */
+    /** @var Request */
     private static $request;
     public static $basePath = 'saml';
     public static $metadataPath = 'metadata';
